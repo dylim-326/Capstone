@@ -5,30 +5,47 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const file = location.state?.file;
+  const { file, result } = location.state || {};
 
   const handleGoHome = () => {
     navigate('/');
   };
 
-  if (!file) {
-    return <h2>⚠️ 파일이 전달되지 않았습니다.</h2>;
+  if (!file || !result) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h2>⚠️ 파일 또는 결과 데이터가 전달되지 않았습니다.</h2>
+        <button
+          onClick={handleGoHome}
+          style={{
+            marginTop: '20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '1rem'
+          }}
+        >
+          🏠 홈으로 돌아가기
+        </button>
+      </div>
+    );
   }
 
   return (
     <div>
       {/* 상단바 */}
-      <div
-        style={{
-          backgroundColor: '#282c34',
-          padding: '20px',
-          color: 'white',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Deepfake Detector</h2>
+      <div style={{
+        backgroundColor: '#282c34',
+        padding: '20px',
+        color: 'white',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <h2 style={{ margin: 0 }}>DE-fake it</h2>
         <button
           onClick={handleGoHome}
           style={{
@@ -64,10 +81,11 @@ function Result() {
         </video>
 
         <div style={{ marginTop: '40px' }}>
-          <h1 style={{ color: 'red', fontSize: '2.5rem' }}>80% Fake!</h1>
+          <h1 style={{ color: 'red', fontSize: '2.5rem' }}>
+            {result.confidence}% {result.result}!
+          </h1>
           <p style={{ marginTop: '25px', fontSize: '1.3rem', lineHeight: '1.8' }}>
-            눈의 깜박임이 시간에 따라 부자연스럽고,<br />
-            입 모양과 오디오의 싱크가 맞지 않습니다.
+            {result.explanation}
           </p>
         </div>
       </div>
