@@ -4,7 +4,16 @@ import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // 가짜 서버 응답 (Mock Response)
+  const mockResponse = {
+    result: "Fake",
+    confidence: 87.2,
+    explanation: "눈 깜박임이 비정상적이고, 입 모양과 소리가 어긋납니다."
+  };
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -12,10 +21,11 @@ function Home() {
 
   const handleDetect = async () => {
     if (!file) {
-      alert("파일을 선택해주세요!");
+      alert("⚠️ 파일을 선택해주세요!");
       return;
     }
 
+<<<<<<< HEAD:frontend/src/pages/Home.jsx
     const formData = new FormData();
     formData.append('file', file);
 
@@ -37,6 +47,36 @@ function Home() {
     } catch (error) {
       console.error('Error uploading file:', error);
       alert('파일 업로드 중 오류 발생');
+=======
+    setLoading(true);
+    setError("");
+
+    try {
+      // 가짜 fetch 요청 시뮬레이션
+      const fakeFetch = new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            ok: true,
+            json: async () => mockResponse
+          });
+        }, 1500); // 1.5초 대기
+      });
+
+      const response = await fakeFetch;
+
+      if (!response.ok) {
+        throw new Error('서버 응답 실패');
+      }
+
+      const data = await response.json();
+
+      navigate('/result', { state: { file, result: data } });
+
+    } catch (e) {
+      setError("서버 요청 중 오류 발생");
+    } finally {
+      setLoading(false);
+>>>>>>> 78f4850bd37aaa2476c864f3724104331b0c3655:src/pages/Home.jsx
     }
   };
 
@@ -44,7 +84,7 @@ function Home() {
     <div>
       {/* 상단바 */}
       <div style={{ backgroundColor: '#282c34', padding: '20px', color: 'white' }}>
-        <h2 style={{ margin: 0 }}>Deepfake Detector</h2>
+        <h2 style={{ margin: 0 }}>DE-fake it</h2>
       </div>
 
       {/* 중앙 정렬 레이아웃 */}
@@ -62,7 +102,7 @@ function Home() {
           alignItems: 'center',
           paddingTop: '40px'
         }}>
-          {/* 설명 문구 */}
+          {/* 설명 */}
           <div style={{ maxWidth: '500px' }}>
             <h1 style={{ fontWeight: 'bold', fontSize: '2rem', marginBottom: '20px' }}>
               단순 판별은 그만,<br />“왜” 그런지도 함께 확인하세요!
@@ -85,13 +125,15 @@ function Home() {
               type="file"
               accept="video/*,audio/*"
               onChange={handleFileChange}
+              disabled={loading}
               style={{ width: '100%', marginBottom: '30px', fontSize: '1rem' }}
             />
             <br />
             <button
               onClick={handleDetect}
+              disabled={loading}
               style={{
-                backgroundColor: '#007bff',
+                backgroundColor: loading ? 'gray' : '#007bff',
                 color: 'white',
                 border: 'none',
                 padding: '14px 28px',
@@ -100,8 +142,11 @@ function Home() {
                 fontSize: '1.1rem'
               }}
             >
-              Detect Now
+              {loading ? "분석 중..." : "Detect Now"}
             </button>
+
+            {/* 에러 메시지 표시 */}
+            {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
           </div>
         </div>
       </div>
