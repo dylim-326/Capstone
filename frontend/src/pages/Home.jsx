@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,13 +6,6 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
-  // 가짜 서버 응답 (Mock Response)
-  const mockResponse = {
-    result: "Fake",
-    confidence: 87.2,
-    explanation: "눈 깜박임이 비정상적이고, 입 모양과 소리가 어긋납니다."
-  };
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -25,12 +17,13 @@ function Home() {
       return;
     }
 
-<<<<<<< HEAD:frontend/src/pages/Home.jsx
     const formData = new FormData();
     formData.append('file', file);
 
+    setLoading(true);
+    setError("");
+
     try {
-      // Django로 POST 요청 보내기
       const response = await fetch('http://127.0.0.1:8000/api/upload/', {
         method: 'POST',
         body: formData,
@@ -39,44 +32,24 @@ function Home() {
       const data = await response.json();
 
       if (response.ok) {
-        // 서버에서 반환한 결과
-        navigate('/result', { state: { fileUrl: data.file_url, videoId: data.video_id } });
+        navigate('/result', {
+          state: {
+            fileUrl: data.file_url,
+            videoId: data.video_id,
+            result: data.result,             // ✅ 추가
+            confidence: data.confidence,     // ✅ 추가
+            explanation: data.explanation    // ✅ 추가
+          }
+        });
       } else {
-        alert('파일 업로드 실패');
+        alert('❌ 파일 업로드 실패');
       }
+
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('파일 업로드 중 오류 발생');
-=======
-    setLoading(true);
-    setError("");
-
-    try {
-      // 가짜 fetch 요청 시뮬레이션
-      const fakeFetch = new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            ok: true,
-            json: async () => mockResponse
-          });
-        }, 1500); // 1.5초 대기
-      });
-
-      const response = await fakeFetch;
-
-      if (!response.ok) {
-        throw new Error('서버 응답 실패');
-      }
-
-      const data = await response.json();
-
-      navigate('/result', { state: { file, result: data } });
-
-    } catch (e) {
       setError("서버 요청 중 오류 발생");
     } finally {
       setLoading(false);
->>>>>>> 78f4850bd37aaa2476c864f3724104331b0c3655:src/pages/Home.jsx
     }
   };
 
